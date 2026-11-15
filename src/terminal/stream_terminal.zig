@@ -2015,6 +2015,12 @@ pub const Handler = struct {
             return;
         }
 
+        // wired patch: same rule as the Ghostty app (src/termio/stream_handler.zig, setMode):
+        // with an explicit default cursor blink, DEC mode 12 is ignored so legacy programs
+        // (e.g. ncurses `cnorm` = CSI ? 12 l) cannot stop the blink for good. DECSCUSR still
+        // controls blinking.
+        if (mode == .cursor_blinking and self.terminal.cursor.default_blink != null) return;
+
         // Set the mode on the terminal
         self.terminal.modes.set(mode, enabled);
 
